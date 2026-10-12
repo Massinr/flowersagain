@@ -1,0 +1,407 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Bouquet for Alae</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Hanken+Grotesk:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow column. Title, the bouquet drawn in SVG, a note card that changes as each bud opens, then a closing letter once all seven are open. */
+:root {
+  --bg: #efe7ee;
+  --fg: #2a1830;
+  --muted: #6d5a73;
+  --card: #faf5f9;
+  --line: #d6c4d5;
+  --accent: #b0305a;
+  --on-accent: #ffffff;
+  --stem: #4d8458;
+  --leaf: #5e9a66;
+  --paper: #c996b3;
+  --paper-2: #e4bdd3;
+  --ribbon: #b0305a;
+  --display: "Gloock", Georgia, "Times New Roman", serif;
+  --body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1c1022;
+    --fg: #f4e8f2;
+    --muted: #b9a2bf;
+    --card: #2a1a33;
+    --line: #43294f;
+    --accent: #ff8db0;
+    --on-accent: #2a0f1b;
+    --stem: #6fb27c;
+    --leaf: #7ec68a;
+    --paper: #8c5a7c;
+    --paper-2: #a56f95;
+    --ribbon: #ff8db0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1c1022;
+  --fg: #f4e8f2;
+  --muted: #b9a2bf;
+  --card: #2a1a33;
+  --line: #43294f;
+  --accent: #ff8db0;
+  --on-accent: #2a0f1b;
+  --stem: #6fb27c;
+  --leaf: #7ec68a;
+  --paper: #8c5a7c;
+  --paper-2: #a56f95;
+  --ribbon: #ff8db0;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 1rem;
+  line-height: 1.55;
+  padding-inline: 16px;
+  padding-block: 28px 56px;
+}
+.wrap {
+  max-width: 30rem;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+header { display: flex; flex-direction: column; gap: 8px; }
+.kicker {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 11vw, 3.8rem);
+  line-height: 1;
+  margin: 0;
+  text-wrap: balance;
+}
+.sub { margin: 0; color: var(--muted); max-width: 26rem; }
+
+.stage svg { display: block; width: 100%; height: auto; overflow: visible; }
+.stem { fill: none; stroke: var(--stem); stroke-width: 3.2; stroke-linecap: round; }
+.leaf { fill: var(--leaf); }
+.paper { fill: var(--paper); }
+.paper2 { fill: var(--paper-2); }
+.ribbon { fill: var(--ribbon); }
+.ribbon-line { fill: none; stroke: var(--ribbon); stroke-width: 4; stroke-linecap: round; }
+
+.grow { stroke-dasharray: 1 1; animation: grow 1.3s ease-out both; }
+@keyframes grow { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+.flower { cursor: pointer; outline: none; }
+.flower .hit { fill: transparent; }
+.flower:focus-visible .hit { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; }
+.flower .bloom,
+.flower .bud { transform-box: fill-box; transform-origin: center; }
+.flower.tulip .bloom { transform-origin: 50% 100%; }
+.flower .bloom {
+  opacity: 0;
+  transform: scale(0.15) rotate(-25deg);
+  transition: transform 0.85s cubic-bezier(0.2, 1.35, 0.35, 1), opacity 0.4s ease;
+}
+.flower.open .bloom { opacity: 1; transform: none; }
+.flower .bud { transition: opacity 0.3s ease, transform 0.3s ease; }
+.flower.open .bud { opacity: 0; transform: scale(0.4); }
+.flower:not(.open) .bud { animation: nudge 2.6s ease-in-out infinite; }
+@keyframes nudge { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+
+.note {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 9.5rem;
+}
+.note-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+.dots { display: flex; gap: 7px; }
+.dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  background: transparent;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+.dot.on { background: var(--c); border-color: var(--c); }
+.count { font-size: 0.8125rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.msg {
+  font-family: var(--display);
+  font-size: 1.45rem;
+  line-height: 1.28;
+  margin: 0;
+  text-wrap: balance;
+  animation: rise 0.5s ease both;
+}
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn {
+  font-family: var(--body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.7em 1.2em;
+  border-radius: 999px;
+  border: 1.5px solid var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  cursor: pointer;
+}
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn:hover { filter: brightness(1.08); }
+.btn:disabled { opacity: 0.55; cursor: default; filter: none; }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.letter {
+  border-top: 1px solid var(--line);
+  padding-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: rise 0.8s ease both;
+}
+.letter .to { font-family: var(--display); font-size: 2rem; line-height: 1; margin: 0; }
+.letter p { margin: 0; max-width: 28rem; font-size: 1.0625rem; }
+.letter .sign { font-family: var(--display); font-size: 1.3rem; color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="kicker">Seven buds</p>
+    <h1>Alae,</h1>
+    <p class="sub">I picked these out for you. Tap a bud to open it.</p>
+  </header>
+
+  <div class="stage" id="stage"></div>
+
+  <section class="note" aria-live="polite">
+    <div class="note-top">
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <span class="count" id="count">0 of 7 open</span>
+    </div>
+    <p class="msg" id="msg">Start with any one of them.</p>
+    <div class="actions">
+      <button class="btn" id="all" type="button">Open them all</button>
+    </div>
+  </section>
+
+  <section class="letter" id="letter" hidden>
+    <p class="to">Alae,</p>
+    <p>I can't hand you a real bouquet through a screen, so I built one that opens every time you tap it.</p>
+    <p>Seven flowers, seven things I mean, and plenty more I'll say in person.</p>
+    <p class="sign">Yours.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  var BASE = { x: 200, y: 470 };
+  var FLOWERS = [
+    { t: 'tulip',   c: '#ffc83d', x: 200, y: 122, s: 50, msg: 'You make an ordinary Tuesday feel like something.' },
+    { t: 'rose',    c: '#d6336c', x: 120, y: 176, s: 46, msg: 'I notice how you start laughing before the joke is finished.' },
+    { t: 'anemone', c: '#b79ced', x: 285, y: 168, s: 46, msg: 'Home is wherever you are.' },
+    { t: 'daisy',   c: '#fff8f2', x: 58,  y: 246, s: 42, msg: 'Thank you for being patient with me.' },
+    { t: 'rose',    c: '#ff7a6b', x: 338, y: 256, s: 46, msg: 'I am proud of you, and I do not say it enough.' },
+    { t: 'tulip',   c: '#ff9ec0', x: 125, y: 300, s: 44, msg: 'You are the first person I want to tell things to.' },
+    { t: 'daisy',   c: '#ffd2b0', x: 278, y: 300, s: 42, msg: 'I would choose you again tomorrow.' }
+  ];
+  var TOTAL = FLOWERS.length;
+
+  function hexToRgb(h) { h = h.replace('#', ''); return [0, 2, 4].map(function (i) { return parseInt(h.slice(i, i + 2), 16); }); }
+  function mix(a, b, t) {
+    var A = hexToRgb(a), B = hexToRgb(b);
+    return '#' + A.map(function (v, i) { return Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0'); }).join('');
+  }
+  function f(n) { return +n.toFixed(1); }
+
+  function ring(n, d, rx, ry, fill, stroke, off) {
+    var o = '';
+    for (var i = 0; i < n; i++) {
+      var a = (off || 0) + i * 360 / n;
+      o += '<ellipse cx="0" cy="' + f(-d) + '" rx="' + f(rx) + '" ry="' + f(ry) + '" fill="' + fill + '" stroke="' + stroke + '" stroke-opacity=".3" stroke-width="1" transform="rotate(' + f(a) + ')"/>';
+    }
+    return o;
+  }
+
+  function bloomRose(s, c) {
+    var k = mix(c, '#000000', 0.3);
+    return ring(6, 0.5 * s, 0.34 * s, 0.3 * s, mix(c, '#ffffff', 0.25), k, 0) +
+      ring(5, 0.34 * s, 0.3 * s, 0.27 * s, c, k, 18) +
+      ring(4, 0.2 * s, 0.24 * s, 0.22 * s, mix(c, '#000000', 0.1), k, 10) +
+      ring(3, 0.08 * s, 0.16 * s, 0.15 * s, mix(c, '#000000', 0.25), k, 30);
+  }
+  function bloomDaisy(s, c) {
+    var k = mix(c, '#000000', 0.22);
+    return ring(14, 0.46 * s, 0.1 * s, 0.33 * s, c, k, 0) +
+      '<circle r="' + f(0.22 * s) + '" fill="#f2b632" stroke="#c98a10" stroke-opacity=".5"/>' +
+      '<circle r="' + f(0.1 * s) + '" fill="#c98a10" fill-opacity=".45"/>';
+  }
+  function bloomAnemone(s, c) {
+    var k = mix(c, '#000000', 0.3);
+    return ring(8, 0.4 * s, 0.24 * s, 0.36 * s, c, k, 0) +
+      ring(8, 0.22 * s, 0.12 * s, 0.2 * s, mix(c, '#ffffff', 0.3), k, 22) +
+      '<circle r="' + f(0.15 * s) + '" fill="#2f2250"/>' +
+      '<circle r="' + f(0.23 * s) + '" fill="none" stroke="#2f2250" stroke-width="2" stroke-dasharray="2 3"/>';
+  }
+  function bloomTulip(s, c) {
+    var k = mix(c, '#000000', 0.3);
+    var back = mix(c, '#000000', 0.18);
+    function P(d, fill) { return '<path d="' + d + '" fill="' + fill + '" stroke="' + k + '" stroke-opacity=".4" stroke-width="1" vector-effect="non-scaling-stroke"/>'; }
+    return '<g transform="scale(' + s + ')">' +
+      P('M0,0 C-.62,-.05 -.66,-.78 -.3,-1.22 C-.14,-.92 -.04,-.5 0,0Z', back) +
+      P('M0,0 C.62,-.05 .66,-.78 .3,-1.22 C.14,-.92 .04,-.5 0,0Z', back) +
+      P('M-.36,-.04 C-.52,-.62 -.2,-1.02 0,-1.3 C.2,-1.02 .52,-.62 .36,-.04 C.18,.1 -.18,.1 -.36,-.04Z', c) +
+      '</g>';
+  }
+  function bud(s, c, tulip) {
+    var b = s * 0.55, k = mix(c, '#000000', 0.3);
+    var dy = tulip ? -0.5 * s : 0;
+    return '<g transform="translate(0 ' + f(dy) + ')">' +
+      '<path d="M0,' + f(-0.5 * b) + ' C' + f(0.36 * b) + ',' + f(-0.28 * b) + ' ' + f(0.3 * b) + ',' + f(0.22 * b) + ' 0,' + f(0.32 * b) +
+      ' C' + f(-0.3 * b) + ',' + f(0.22 * b) + ' ' + f(-0.36 * b) + ',' + f(-0.28 * b) + ' 0,' + f(-0.5 * b) + 'Z" fill="' + c + '" stroke="' + k + '" stroke-opacity=".45"/>' +
+      '<path class="leaf" d="M' + f(-0.3 * b) + ',' + f(0.3 * b) + ' Q0,' + f(0.02 * b) + ' ' + f(0.3 * b) + ',' + f(0.3 * b) + ' Q0,' + f(0.55 * b) + ' ' + f(-0.3 * b) + ',' + f(0.3 * b) + 'Z"/>' +
+      '</g>';
+  }
+  var BUILD = { rose: bloomRose, daisy: bloomDaisy, anemone: bloomAnemone, tulip: bloomTulip };
+
+  function qpoint(p0, p1, p2, t) {
+    var u = 1 - t;
+    return { x: u * u * p0.x + 2 * u * t * p1.x + t * t * p2.x, y: u * u * p0.y + 2 * u * t * p1.y + t * t * p2.y };
+  }
+
+  var stems = '', leaves = '', heads = '';
+  FLOWERS.forEach(function (fl, i) {
+    var ctrl = { x: BASE.x + (fl.x - BASE.x) * 0.15, y: (BASE.y + fl.y) / 2 };
+    stems += '<path class="stem grow" pathLength="1" style="animation-delay:' + f(i * 0.12) + 's" d="M' + BASE.x + ',' + BASE.y + ' Q' + f(ctrl.x) + ',' + f(ctrl.y) + ' ' + fl.x + ',' + fl.y + '"/>';
+    if (i % 2 === 1 || i === 4) {
+      var p = qpoint(BASE, ctrl, fl, 0.55);
+      var side = fl.x < BASE.x ? -1 : 1;
+      leaves += '<ellipse class="leaf" rx="7" ry="17" transform="translate(' + f(p.x) + ' ' + f(p.y) + ') rotate(' + (side * 52) + ') translate(0 -15)"/>';
+    }
+    var tulip = fl.t === 'tulip';
+    var hr = fl.s * 0.95, hy = tulip ? -fl.s * 0.55 : 0;
+    heads += '<g class="flower ' + fl.t + '" data-i="' + i + '" role="button" tabindex="0" aria-label="Flower ' + (i + 1) + ' of ' + TOTAL + ', tap to open" transform="translate(' + fl.x + ' ' + fl.y + ')">' +
+      '<circle class="hit" r="' + f(hr) + '" cy="' + f(hy) + '"/>' +
+      '<g class="bloom">' + BUILD[fl.t](fl.s, fl.c) + '</g>' +
+      '<g class="bud" style="animation-delay:' + f(i * 0.35) + 's">' + bud(fl.s, fl.c, tulip) + '</g>' +
+      '</g>';
+  });
+
+  var wrap =
+    '<path class="paper" d="M112,448 L288,448 L234,554 L166,554Z"/>' +
+    '<path class="paper2" d="M112,448 L200,502 L288,448 L282,462 L200,516 L118,462Z"/>' +
+    '<path class="ribbon-line" d="M200,508 C186,526 178,538 172,548"/>' +
+    '<path class="ribbon-line" d="M200,508 C214,526 222,538 228,548"/>' +
+    '<ellipse class="ribbon" cx="184" cy="502" rx="15" ry="8" transform="rotate(-18 184 502)"/>' +
+    '<ellipse class="ribbon" cx="216" cy="502" rx="15" ry="8" transform="rotate(18 216 502)"/>' +
+    '<circle class="ribbon" cx="200" cy="507" r="6.5"/>';
+
+  var stage = document.getElementById('stage');
+  stage.innerHTML = '<svg viewBox="0 0 400 560" role="group" aria-label="A bouquet of seven buds">' + stems + leaves + heads + wrap + '</svg>';
+
+  var els = Array.prototype.slice.call(stage.querySelectorAll('.flower'));
+  var dotsEl = document.getElementById('dots');
+  var countEl = document.getElementById('count');
+  var msgEl = document.getElementById('msg');
+  var letter = document.getElementById('letter');
+  var allBtn = document.getElementById('all');
+  var opened = [];
+  var running = false;
+  var timers = [];
+
+  dotsEl.innerHTML = FLOWERS.map(function (fl) { return '<span class="dot" style="--c:' + fl.c + '"></span>'; }).join('');
+  var dotEls = Array.prototype.slice.call(dotsEl.children);
+
+  function setMsg(text) {
+    msgEl.textContent = text;
+    msgEl.style.animation = 'none';
+    void msgEl.offsetWidth;
+    msgEl.style.animation = '';
+  }
+
+  function refresh() {
+    var n = opened.filter(Boolean).length;
+    countEl.textContent = n + ' of ' + TOTAL + ' open';
+    allBtn.textContent = n === TOTAL ? 'Close them again' : 'Open them all';
+    allBtn.disabled = running;
+    allBtn.className = n === TOTAL ? 'btn ghost' : 'btn';
+    if (n === TOTAL) { letter.hidden = false; } else { letter.hidden = true; }
+  }
+
+  function openFlower(i) {
+    if (opened[i]) { setMsg(FLOWERS[i].msg); return; }
+    opened[i] = true;
+    els[i].classList.add('open');
+    els[i].setAttribute('aria-label', 'Flower ' + (i + 1) + ' of ' + TOTAL + ', open');
+    dotEls[i].classList.add('on');
+    setMsg(FLOWERS[i].msg);
+    refresh();
+  }
+
+  function reset() {
+    timers.forEach(clearTimeout);
+    timers = [];
+    running = false;
+    opened = [];
+    els.forEach(function (el, i) {
+      el.classList.remove('open');
+      el.setAttribute('aria-label', 'Flower ' + (i + 1) + ' of ' + TOTAL + ', tap to open');
+    });
+    dotEls.forEach(function (d) { d.classList.remove('on'); });
+    setMsg('Start with any one of them.');
+    refresh();
+  }
+
+  function openAll() {
+    running = true;
+    refresh();
+    var delay = 0;
+    FLOWERS.forEach(function (_, i) {
+      if (opened[i]) return;
+      timers.push(setTimeout(function () { openFlower(i); }, delay));
+      delay += 700;
+    });
+    timers.push(setTimeout(function () { running = false; refresh(); }, delay));
+  }
+
+  els.forEach(function (el) {
+    var i = +el.getAttribute('data-i');
+    el.addEventListener('click', function () { openFlower(i); });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFlower(i); }
+    });
+  });
+  allBtn.addEventListener('click', function () {
+    if (opened.filter(Boolean).length === TOTAL) { reset(); } else { openAll(); }
+  });
+
+  refresh();
+})();
+</script>
+
+</body></html>
